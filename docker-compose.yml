@@ -1,0 +1,40 @@
+services:
+  backend:
+    build: ./Backend
+    container_name: kantowork-backend
+    restart: unless-stopped
+    environment:
+      PGHOST: db          # service name, not localhost
+      PGPORT: 5432        # internal port, not 5433
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./Backend:/app          # your code → container, enables hot reload
+      - /app/node_modules       # container keeps its own Linux node_modules
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:18
+    container_name: kantowork-db
+    restart: unless-stopped
+    environment:
+        POSTGRES_DB: ${POSTGRES_DB}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+        - "5433:5432"
+    volumes:
+        - db-data:/var/lib/postgresql/data
+    healthcheck:
+        test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+        interval: 5s
+        timeout: 5s
+        retries: 5
+
+volumes:
+  db-data:
