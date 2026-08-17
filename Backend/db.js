@@ -10,6 +10,7 @@ var pool = new Pool({
   user: process.env.PGUSER || process.env.POSTGRES_USER,
   password: process.env.PGPASSWORD || process.env.POSTGRES_PASSWORD,
   database: process.env.PGDATABASE || process.env.POSTGRES_DB,
+  options: '-c search_path=kantowork,public',
 });
 
 pool.on('error', function (err) {
