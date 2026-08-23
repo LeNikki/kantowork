@@ -12,8 +12,8 @@ const signup = async (req, res, next)=>{
             return res.status(400).json({errors: errors.array()});
         }
 
-        const {name, email, password} = req.body;
-        const user = await authService.signup(name, email, password);
+        const {name, email, password, role} = req.body;
+        const user = await authService.signup(name, email, password, role);
 
         res.status(201).json({
             message: 'User created successfully',
@@ -27,4 +27,17 @@ const signup = async (req, res, next)=>{
     }
 };
 
-module.exports = {signup};
+const signup
+
+const login = async (req, res, next)=>{
+    try{
+        const {user, token} = await authService.login(req.body.email, req.body.password );
+        res.json({
+            user: {id: user.id, name: user.name, email: user.email}, token
+        });
+    } catch(err){
+        next(err);
+    }
+}
+
+module.exports = {signup, login};

@@ -7,6 +7,7 @@ class User{
         this.role = role;
     }
 
+     //You can convert that database row into your application's User object:
     static fromRow(row){
         return new User(row);
     }
