@@ -17,7 +17,7 @@ const signup = async (req, res, next)=>{
 
         res.status(201).json({
             message: 'User created successfully',
-            user: {id: user.id, name: user.name, email: user.email, role: user.role}
+            user: user.toPublic()
         });
     }catch(err){
         if (err.message === 'Email already registered') {
@@ -27,4 +27,29 @@ const signup = async (req, res, next)=>{
     }
 };
 
-module.exports = {signup};
+const login = async (req, res, next)=>{
+    try{
+        await body('email').isEmail().withMessage('Must be a valid email').run(req);
+        await body('password').notEmpty().withMessage('Password is required').run(req);
+
+        const errors = validationResult(req);
+        if(!errors.isEmpty()){
+            return res.status(400).json({errors: errors.array()});
+        }
+
+        const {email, password} = req.body;
+        const user = await authService.login(email, password);
+
+        res.json({
+            message: 'Logged in successfully',
+            user: user.toPublic()
+        });
+    }catch(err){
+        if (err.message === 'Invalid email or password') {
+            return res.status(401).json({ error: err.message });
+        }
+        next(err);
+    }
+};
+
+module.exports = {signup, login};
