@@ -16,4 +16,11 @@ const findByEmail = (email) => {
   );
 };
 
-module.exports = {createUser, findByEmail};
+const findById = (id) => {
+  return pool.query(
+    `SELECT * FROM kantowork.users WHERE id = $1`,
+    [id]
+  );
+};
+
+module.exports = {createUser, findByEmail, findById};
