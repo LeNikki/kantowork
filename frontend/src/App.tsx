@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { api, getToken, type User } from './api'
+import { getToken, type User } from './api'
+import { authService } from './services/authService'
 import GuestLayout from './layouts/GuestLayout'
 import AuthLayout from './layouts/AuthLayout'
 import Landing from './pages/Landing'
@@ -17,8 +18,8 @@ export default function App() {
 
   useEffect(() => {
     if (!getToken()) return
-    api<{ user: User }>('/api/auth/me')
-      .then((d) => setUser(d.user))
+    authService.me()
+      .then(setUser)
       .catch(() => setUser(null))
       .finally(() => setLoading(false))
   }, [])

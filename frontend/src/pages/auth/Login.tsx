@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { api, setToken, type AuthResponse, type User } from '../../api'
+import type { User } from '../../api'
+import { authService } from '../../services/authService'
 
 export default function Login({ onAuth }: { onAuth: (u: User) => void }) {
   const [email, setEmail] = useState('')
@@ -13,9 +14,7 @@ export default function Login({ onAuth }: { onAuth: (u: User) => void }) {
     setError('')
     setBusy(true)
     try {
-      const d = await api<AuthResponse>('/api/auth/login', { email, password })
-      setToken(d.token)
-      onAuth(d.user)
+      onAuth(await authService.login(email, password))
     } catch (err) {
       setError((err as Error).message)
     } finally {

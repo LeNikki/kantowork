@@ -1,5 +1,6 @@
 import { Link, Navigate, Outlet } from 'react-router-dom'
-import { api, clearToken, type User } from '../api'
+import type { User } from '../api'
+import { authService } from '../services/authService'
 
 // Wraps every signed-in page, and guards them: no user, no entry.
 // The user is passed down through the outlet context so child pages get a
@@ -11,8 +12,7 @@ export default function AuthLayout({ user, onLogout }: { user: User | null; onLo
   // the next render and send us to /login. Navigating by hand races that and
   // bounces through /dashboard on the way.
   const logout = async () => {
-    await api('/api/auth/logout', {}).catch(() => {})
-    clearToken()
+    await authService.logout()
     onLogout()
   }
 
