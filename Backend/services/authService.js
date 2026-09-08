@@ -4,19 +4,20 @@ const userQueries = require('../db/queries/userQueries');
 
 const SALT_ROUNDS = 10;
 
-const signup = async (name, email, password)=>{
+const signupService = async (name, email, password, role)=>{
+    //Before signup, check existing user
     const existingUser = await userQueries.findByEmail(email);
     if(existingUser.rows.length > 0){
         throw new Error('Email already registered');
     }
-
+    //hash password first
     const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
     const result = await userQueries.createUser(name, email, password_hash, 'user');
 
     return User.fromRow(result.rows[0]);
 };
 
-const login = async(email, password)=>{
+const loginService = async(email, password)=>{
     const result = await userQueries.findByEmail(email);
     if(result.rows.length === 0){
         throw new Error('Invalid email or password');
@@ -37,4 +38,4 @@ const getById = async (id)=>{
     return User.fromRow(result.rows[0]);
 };
 
-module.exports = {signup, login, getById};
+module.exports = {signupService, loginService};
