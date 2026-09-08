@@ -1,18 +1,8 @@
-const {body, validationResult} = require('express-validator');
 const authService = require('../services/authService');
 const {signToken, EXPIRES_IN} = require('../config/jwt');
 
 const signup = async (req, res, next)=>{
     try{
-        await body('name').notEmpty().withMessage('Name is required').run(req);
-        await body('email').isEmail().withMessage('Must be a valid email').run(req);
-        await body('password').isLength({min: 8}).withMessage('Password must be at least 8 characters').run(req);
-
-        const errors = validationResult(req);
-        if(!errors.isEmpty()){
-            return res.status(400).json({errors: errors.array()});
-        }
-
         // `role` is deliberately NOT read from the body - a client must not be
         // able to register itself as an admin.
         const {name, email, password} = req.body;
@@ -34,14 +24,6 @@ const signup = async (req, res, next)=>{
 
 const login = async (req, res, next)=>{
     try{
-        await body('email').isEmail().withMessage('Must be a valid email').run(req);
-        await body('password').notEmpty().withMessage('Password is required').run(req);
-
-        const errors = validationResult(req);
-        if(!errors.isEmpty()){
-            return res.status(400).json({errors: errors.array()});
-        }
-
         const {email, password} = req.body;
         const user = await authService.login(email, password);
 
@@ -59,9 +41,6 @@ const login = async (req, res, next)=>{
     }
 };
 
-// The frontend calls this on page load to turn a stored token back into a user.
-// Reads the row fresh, so a role change takes effect without waiting for the
-// token to expire.
 const me = async (req, res, next)=>{
     try{
         const user = await authService.getById(req.user.id);
@@ -74,8 +53,7 @@ const me = async (req, res, next)=>{
     }
 };
 
-// JWTs are stateless - the server cannot revoke one. Logging out means the
-// client discards its copy; the token stays valid until it expires.
+// JWTs are stateless - the server cannot revoke one. The client discards it.
 const logout = (req, res)=>{
     res.status(204).end();
 };
