@@ -23,14 +23,12 @@ function Home({ user, onLogout }: { user: User; onLogout: () => void }) {
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+  // Only "loading" if there is a token worth checking - with none, we already
+  // know the answer and can render the login route on the first pass.
+  const [loading, setLoading] = useState(() => Boolean(getToken()))
 
   useEffect(() => {
-    // No token means no point asking the server who we are.
-    if (!getToken()) {
-      setLoading(false)
-      return
-    }
+    if (!getToken()) return
     api<{ user: User }>('/api/auth/me')
       .then((d) => setUser(d.user))
       .catch(() => setUser(null))
