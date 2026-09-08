@@ -1,19 +1,6 @@
 const {body, validationResult} = require('express-validator');
 const authService = require('../services/authService');
-const {COOKIE_NAME} = require('../config/session');
-
-// Issue a brand new session id, then store who the user is.
-// Regenerating first means a session id captured before login is useless
-// afterwards (session fixation).
-const startSession = (req, userId) => {
-    return new Promise((resolve, reject) => {
-        req.session.regenerate((regenErr) => {
-            if (regenErr) return reject(regenErr);
-            req.session.userId = userId;
-            req.session.save((saveErr) => saveErr ? reject(saveErr) : resolve());
-        });
-    });
-};
+const {signToken, EXPIRES_IN} = require('../config/jwt');
 
 const signup = async (req, res, next)=>{
     try{
@@ -26,13 +13,16 @@ const signup = async (req, res, next)=>{
             return res.status(400).json({errors: errors.array()});
         }
 
+        // `role` is deliberately NOT read from the body - a client must not be
+        // able to register itself as an admin.
         const {name, email, password} = req.body;
         const user = await authService.signup(name, email, password);
-        await startSession(req, user.id);
 
         res.status(201).json({
             message: 'User created successfully',
-            user: user.toPublic()
+            user: user.toPublic(),
+            token: signToken(user),
+            expiresIn: EXPIRES_IN
         });
     }catch(err){
         if (err.message === 'Email already registered') {
@@ -54,11 +44,12 @@ const login = async (req, res, next)=>{
 
         const {email, password} = req.body;
         const user = await authService.login(email, password);
-        await startSession(req, user.id);
 
         res.json({
             message: 'Logged in successfully',
-            user: user.toPublic()
+            user: user.toPublic(),
+            token: signToken(user),
+            expiresIn: EXPIRES_IN
         });
     }catch(err){
         if (err.message === 'Invalid email or password') {
@@ -68,32 +59,25 @@ const login = async (req, res, next)=>{
     }
 };
 
-// Who am I? The frontend calls this on page load to restore the logged-in state.
+// The frontend calls this on page load to turn a stored token back into a user.
+// Reads the row fresh, so a role change takes effect without waiting for the
+// token to expire.
 const me = async (req, res, next)=>{
     try{
-        const user = await authService.getById(req.session.userId);
+        const user = await authService.getById(req.user.id);
         res.json({user: user.toPublic()});
     }catch(err){
-        // Session points at a user row that no longer exists.
         if (err.message === 'User not found') {
-            return req.session.destroy(() => {
-                res.clearCookie(COOKIE_NAME);
-                res.status(401).json({error: 'Not authenticated'});
-            });
+            return res.status(401).json({error: 'Not authenticated'});
         }
         next(err);
     }
 };
 
-const logout = (req, res, next)=>{
-    if(!req.session){
-        return res.status(204).end();
-    }
-    req.session.destroy((err)=>{
-        if(err) return next(err);
-        res.clearCookie(COOKIE_NAME);
-        res.status(204).end();
-    });
+// JWTs are stateless - the server cannot revoke one. Logging out means the
+// client discards its copy; the token stays valid until it expires.
+const logout = (req, res)=>{
+    res.status(204).end();
 };
 
 module.exports = {signup, login, me, logout};
