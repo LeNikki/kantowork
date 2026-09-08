@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "dev": "nodemon ./bin/www"
+    "dev": "nodemon ./bin/www",
+    "migrate:up": "node-pg-migrate -m migrations -s kantowork --create-schema up",
+    "migrate:down": "node-pg-migrate -m migrations -s kantowork --create-schema down",
+    "migrate:create": "node-pg-migrate -m migrations create"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -19,6 +22,7 @@
     "pg": "^8.23.0"
   },
   "devDependencies": {
+    "node-pg-migrate": "^9.0.0",
     "nodemon": "^3.1.14"
   }
 }

@@ -6,3 +6,6 @@ node_modules/
 
 # Docker
 db-data/
+
+# macOS
+.DS_Store
