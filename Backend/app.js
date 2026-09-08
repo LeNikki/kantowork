@@ -8,7 +8,6 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var healthRouter = require('./routes/health');
 var authRouter = require('./routes/auth');
-var forgotPasswordRouter = require('./routes/forgot_password');
 
 var app = express();
 
@@ -21,7 +20,6 @@ app.use(cors({ origin: true, credentials: true }));
 app.use('/', indexRouter);
 app.use('/api', healthRouter);
 app.use('/api/auth', authRouter);
-app.use('/api/auth/forgot-password', forgotPasswordRouter);
 app.use('/api/users', usersRouter);
 
 // catch 404 and forward to error handler
