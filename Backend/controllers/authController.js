@@ -58,4 +58,14 @@ const logout = (req, res)=>{
     res.status(204).end();
 };
 
-module.exports = {signup, login, me, logout};
+// Password reset is not implemented yet - the flow still needs a token store
+// (hashed token + expiry), an email sender, and a migration for the table.
+const forgotPassword = async (req, res) => {
+    res.status(501).json({ error: 'Not implemented' });
+};
+
+const resetPassword = async (req, res) => {
+    res.status(501).json({ error: 'Not implemented' });
+};
+
+module.exports = {signup, login, me, logout, forgotPassword, resetPassword};
