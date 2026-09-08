@@ -10,6 +10,7 @@ services:
       PGPASSWORD: ${POSTGRES_PASSWORD}
       PGDATABASE: ${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
       NODE_ENV: development
     ports:
       - "3000:3000"
@@ -46,7 +47,6 @@ services:
         - "5433:5432"
     volumes:
         - db-data:/var/lib/postgresql
-        - ./Backend/migrations:/docker-entrypoint-initdb.d
     healthcheck:
         test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
         interval: 5s
