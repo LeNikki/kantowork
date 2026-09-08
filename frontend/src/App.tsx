@@ -5,9 +5,9 @@ import { authService } from './services/authService'
 import GuestLayout from './layouts/GuestLayout'
 import AuthLayout from './layouts/AuthLayout'
 import Landing from './pages/Landing'
-import Login from './pages/auth/Login'
-import Signup from './pages/auth/Signup'
-import Home from './pages/Home'
+import Login from './pages/user/auth/Login'
+import Signup from './pages/user/auth/Signup'
+import Home from './pages/user/Home'
 import './App.css'
 
 export default function App() {

@@ -1,5 +1,5 @@
 import { useOutletContext } from 'react-router-dom'
-import type { User } from '../api'
+import type { User } from '../../api'
 
 export default function Home() {
   const { user } = useOutletContext<{ user: User }>()

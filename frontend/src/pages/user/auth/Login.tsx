@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import type { User } from '../../api'
-import { authService } from '../../services/authService'
+import type { User } from '../../../api'
+import { authService } from '../../../services/authService'
 
 export default function Login({ onAuth }: { onAuth: (u: User) => void }) {
   const [email, setEmail] = useState('')
