@@ -9,6 +9,8 @@ services:
       PGUSER: ${POSTGRES_USER}
       PGPASSWORD: ${POSTGRES_PASSWORD}
       PGDATABASE: ${POSTGRES_DB}
+      JWT_SECRET: ${JWT_SECRET}
+      NODE_ENV: development
     ports:
       - "3000:3000"
     volumes:
@@ -17,6 +19,20 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: kantowork-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_TARGET: http://backend:3000   # service name, not localhost
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app         # your code -> container, enables hot reload
+      - /app/node_modules       # container keeps its own Linux node_modules
+    depends_on:
+      - backend
 
   db:
     image: postgres:18

@@ -1,0 +1,30 @@
+#!/bin/sh
+# Block the commit if staged frontend files fail ESLint.
+# Enable with:  git config core.hooksPath .githooks
+# Bypass once:  git commit --no-verify
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR \
+  | grep -E '^frontend/.*\.(ts|tsx|js|jsx)$' || true)
+
+# Nothing frontend-ish staged (e.g. a Backend-only commit) - let it through.
+[ -z "$staged" ] && exit 0
+
+if [ ! -d frontend/node_modules ]; then
+  echo "pre-commit: frontend/node_modules is missing - run 'npm install' in frontend/"
+  exit 1
+fi
+
+# ESLint wants paths relative to frontend/
+rel=$(printf '%s\n' "$staged" | sed 's|^frontend/||')
+count=$(printf '%s\n' "$rel" | wc -l | tr -d ' ')
+echo "pre-commit: running ESLint on $count staged file(s)..."
+
+if ! (cd frontend && printf '%s\n' "$rel" | xargs npx eslint); then
+  echo ""
+  echo "pre-commit: ESLint failed - commit aborted."
+  echo "Fix the errors above, or bypass with: git commit --no-verify"
+  exit 1
+fi
+
+echo "pre-commit: ESLint clean."
+exit 0

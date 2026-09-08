@@ -11,6 +11,11 @@ class User{
     static fromRow(row){
         return new User(row);
     }
+
+    // Never send password_hash over the wire.
+    toPublic(){
+        return {id: this.id, name: this.name, email: this.email, role: this.role};
+    }
 }
 
 module.exports = User;

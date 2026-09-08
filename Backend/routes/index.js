@@ -1,13 +1,17 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
+/* GET service info. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.json({
+    name: 'kantowork-api',
+    endpoints: [
+      'GET  /api/health',
+      'POST /api/auth/signup',
+      'POST /api/auth/login',
+      'GET  /api/users',
+    ],
+  });
 });
-
-router.get('/home', function(req, res, next){
-  res.render('home', {title: 'Home'});
-})
 
 module.exports = router;
