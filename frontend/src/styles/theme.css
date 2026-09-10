@@ -1,0 +1,65 @@
+/* ==========================================================================
+   Brand palette — the five source colours.
+   Use these ONLY to define the semantic tokens below; components should
+   never reference a brand colour directly, so a palette change is one edit.
+   (The source hex values carried a trailing "ff" alpha byte; dropped here
+   since fully opaque is the default.)
+   ========================================================================== */
+:root {
+  --mint-cream:      #f1f7ed;
+  --dark-slate-grey: #243e36;
+  --muted-teal:      #7ca982;
+  --frosted-mint:    #e0eec6;
+  --old-gold:        #c2a83e;
+
+  /* Shades derived from the palette. Needed because muted-teal and old-gold
+     are too light to use as *text* on a light ground — both land near 2:1
+     contrast, well under the 4.5:1 minimum. These keep the same hue and
+     saturation, just darker. */
+  --teal-deep:  #3d6a47;  /* teal, readable as text on mint-cream */
+  --gold-deep:  #7d6b1c;  /* gold, readable as text on mint-cream */
+  --slate-mid:  #4e6b5c;  /* between slate and teal, for secondary text */
+  --slate-deep: #1a2b25;  /* darker than the palette, for the dark ground */
+  --line-light: #d7e4d3;  /* mint-cream shaded down, for hairlines */
+  --line-dark:  #35544a;  /* slate lightened, for hairlines on dark */
+}
+
+/* ==========================================================================
+   Semantic tokens — what components actually use.
+   Light theme is the default; dark redefines the same names.
+   ========================================================================== */
+:root {
+  --ground:      var(--mint-cream);
+  --surface:     #ffffff;
+  --highlight:   var(--frosted-mint);
+
+  --ink:         var(--dark-slate-grey);
+  --muted-ink:   var(--slate-mid);
+  --line:        var(--line-light);
+
+  --accent:      var(--dark-slate-grey);   /* button fill */
+  --accent-ink:  var(--mint-cream);        /* text on that fill */
+  --accent-soft: var(--muted-teal);        /* decorative fills, hovers */
+  --link:        var(--teal-deep);
+  --gold:        var(--old-gold);          /* decorative only */
+  --gold-ink:    var(--gold-deep);         /* gold as text */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground:      var(--slate-deep);
+    --surface:     var(--dark-slate-grey);
+    --highlight:   #2c4a3f;
+
+    --ink:         var(--mint-cream);
+    --muted-ink:   var(--muted-teal);
+    --line:        var(--line-dark);
+
+    --accent:      var(--muted-teal);
+    --accent-ink:  #16241f;
+    --accent-soft: #2c4a3f;
+    --link:        var(--frosted-mint);
+    --gold:        var(--old-gold);
+    --gold-ink:    var(--old-gold);
+  }
+}

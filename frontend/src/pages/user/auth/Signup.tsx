@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { api, setToken, type AuthResponse, type User } from '../api'
+import type { User } from '../../../api'
+import { authService } from '../../../services/authService'
 
-export default function Login({ onAuth }: { onAuth: (u: User) => void }) {
+export default function Signup({ onAuth }: { onAuth: (u: User) => void }) {
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -13,9 +15,7 @@ export default function Login({ onAuth }: { onAuth: (u: User) => void }) {
     setError('')
     setBusy(true)
     try {
-      const d = await api<AuthResponse>('/api/auth/login', { email, password })
-      setToken(d.token)
-      onAuth(d.user)
+      onAuth(await authService.signup(name, email, password))
     } catch (err) {
       setError((err as Error).message)
     } finally {
@@ -25,14 +25,15 @@ export default function Login({ onAuth }: { onAuth: (u: User) => void }) {
 
   return (
     <main className="card">
-      <h1>Log in</h1>
+      <h1>Sign up</h1>
       {error && <p className="error">{error}</p>}
       <form onSubmit={submit}>
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" required />
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
-        <button type="submit" disabled={busy}>{busy ? 'Logging in…' : 'Log in'}</button>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password (min 8)" minLength={8} required />
+        <button type="submit" disabled={busy}>{busy ? 'Creating…' : 'Sign up'}</button>
       </form>
-      <p className="muted">No account? <Link to="/signup">Sign up</Link></p>
+      <p className="muted">Have an account? <Link to="/login">Log in</Link></p>
     </main>
   )
 }
