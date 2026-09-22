@@ -2,9 +2,12 @@ import {
   api,
   type PortfolioProject,
   type PublicWorker,
+  type SearchFilters,
   type ServiceOffering,
+  type WorkerPage,
   type WorkerProfile,
 } from '../api'
+import { searchQuery } from '../searchQuery'
 
 // What the profile form sends. Numbers leave the form as strings, and '' is
 // how a cleared field arrives - the API turns both into null.
@@ -38,6 +41,11 @@ export type PortfolioInput = {
 }
 
 export const workerService = {
+  // The directory a client browses. Summaries only: the full profile, with
+  // the portfolio, is a click further on.
+  directory: (filters: SearchFilters = {}, page = { limit: 20, offset: 0 }) =>
+    api<WorkerPage>(`/api/workers${searchQuery(filters, page)}`),
+
   myProfile: () =>
     api<{ profile: WorkerProfile }>('/api/workers/me/profile').then((r) => r.profile),
 

@@ -1,6 +1,7 @@
 const Job = require('../models/job');
 const jobQueries = require('../db/queries/jobQueries');
 const skillQueries = require('../db/queries/skillQueries');
+const workerQueries = require('../db/queries/workerQueries');
 
 /**
  * Which status may follow which. A client cannot set 'assigned' by hand -
@@ -51,12 +52,29 @@ const getOwnedById = async (id, clientId)=>{
     return job;
 };
 
-const listOpen = async ({limit, offset})=>{
+const listOpen = async ({limit, offset, ...filters})=>{
     const [result, count] = await Promise.all([
-        jobQueries.listOpen({limit, offset}),
-        jobQueries.countOpen()
+        jobQueries.listOpen({limit, offset, ...filters}),
+        jobQueries.countOpen(filters)
     ]);
     return {jobs: result.rows.map(Job.fromRow), total: count.rows[0].total};
+};
+
+/**
+ * The jobs a worker could actually do: those asking for at least one skill
+ * they have listed.
+ *
+ * A worker with no skills listed matches nothing, which is the honest answer -
+ * they have not said what they do. A job with no skills listed matches nobody
+ * either; it is still on the unfiltered board, where anyone can find it.
+ */
+const listMatching = async (workerId, {limit, offset, ...filters})=>{
+    const skills = await workerQueries.findSkillsByWorkerId(workerId);
+    const matchSkillIds = skills.rows.map((s) => s.id);
+    if(matchSkillIds.length === 0){
+        return {jobs: [], total: 0, no_skills_listed: true};
+    }
+    return listOpen({limit, offset, ...filters, matchSkillIds});
 };
 
 const listMine = async (clientId, {limit, offset})=>{
@@ -110,4 +128,4 @@ const remove = async (id, clientId)=>{
     await jobQueries.remove(id);
 };
 
-module.exports = {getById, getOwnedById, listOpen, listMine, create, update, changeStatus, remove};
+module.exports = {getById, getOwnedById, listOpen, listMatching, listMine, create, update, changeStatus, remove};

@@ -4,6 +4,22 @@ const skillQueries = require('../db/queries/skillQueries');
 const offeringService = require('./offeringService');
 const portfolioService = require('./portfolioService');
 
+/**
+ * The directory a client browses. Each row is the summary a client scans -
+ * name, headline, where, how long, what they charge, what they do - and the
+ * full profile with services and portfolio is one click further on.
+ */
+const listWorkers = async ({limit, offset, ...filters})=>{
+    const [result, count] = await Promise.all([
+        workerQueries.listWorkers({limit, offset, ...filters}),
+        workerQueries.countWorkers(filters)
+    ]);
+    return {
+        workers: result.rows.map((row) => WorkerProfile.fromRow(row).withSkills(row.skills)),
+        total: count.rows[0].total
+    };
+};
+
 const getOwnProfile = async (userId)=>{
     const result = await workerQueries.findProfileByUserId(userId);
     if(result.rows.length === 0){
@@ -61,4 +77,4 @@ const saveOwnSkills = async (userId, skillIds)=>{
     return getOwnProfile(userId);
 };
 
-module.exports = {getOwnProfile, saveOwnProfile, getPublicProfile, saveOwnSkills};
+module.exports = {listWorkers, getOwnProfile, saveOwnProfile, getPublicProfile, saveOwnSkills};

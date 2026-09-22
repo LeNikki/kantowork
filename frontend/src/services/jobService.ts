@@ -1,4 +1,5 @@
-import { api, type Job, type JobDetail, type JobPage, type JobStatus } from '../api'
+import { api, type Job, type JobDetail, type JobPage, type JobStatus, type SearchFilters } from '../api'
+import { searchQuery } from '../searchQuery'
 
 // What the job form sends. Numbers and the date leave the form as strings,
 // and '' is a field the client left blank - the API turns both into null.
@@ -25,9 +26,16 @@ type Page = { limit?: number; offset?: number }
 
 const query = ({ limit = 20, offset = 0 }: Page) => `?limit=${limit}&offset=${offset}`
 
+const pageOf = ({ limit = 20, offset = 0 }: Page) => ({ limit, offset })
+
 export const jobService = {
-  // The board: every open job, whoever posted it.
-  board: (page: Page = {}) => api<JobPage>(`/api/jobs${query(page)}`),
+  /**
+   * The board: every open job, whoever posted it, narrowed by whatever was
+   * asked for. `mine` asks the server for work matching the caller's own
+   * skills, and it only means anything for a worker.
+   */
+  board: (filters: SearchFilters = {}, page: Page = {}) =>
+    api<JobPage>(`/api/jobs${searchQuery(filters, pageOf(page))}`),
 
   // A client's own postings, in every status - they need to see the
   // cancelled ones too.

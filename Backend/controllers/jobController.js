@@ -21,11 +21,50 @@ const fieldsOf = (body)=>({
     deadline:    body.deadline
 });
 
+/**
+ * The board's filters, read off the query string.
+ *
+ * Nothing here rejects a request: a filter that makes no sense is dropped
+ * rather than answered with a 400. A stray character in a URL should show
+ * the board, not an error page.
+ */
+const filtersOf = (query)=>{
+    const skillIds = String(query.skill_ids ?? '')
+        .split(',')
+        .map((id) => parseInt(id, 10))
+        .filter((id) => Number.isInteger(id) && id > 0);
+
+    const trim = (value) => String(value ?? '').trim().slice(0, 120);
+
+    return {
+        skillIds,
+        location: trim(query.location),
+        q:        trim(query.q)
+    };
+};
+
 const list = async (req, res, next)=>{
     try{
         const page = pageOf(req.query);
-        const {jobs, total} = await jobService.listOpen(page);
-        res.json({jobs: jobs.map((j) => j.toPublic()), total, ...page});
+        const filters = filtersOf(req.query);
+
+        // `mine=1` is a worker asking for work they can do. It means nothing
+        // for a client, who is browsing what they might be competing with.
+        const matching = req.query.mine === '1' && req.user.role === ROLES.WORKER;
+        const result = matching
+            ? await jobService.listMatching(req.user.id, {...page, ...filters})
+            : await jobService.listOpen({...page, ...filters});
+
+        res.json({
+            jobs: result.jobs.map((j) => j.toPublic()),
+            total: result.total,
+            ...page,
+            matching,
+            // Only ever true for a worker who has listed no skills, so the
+            // page can say why the list is empty rather than implying there
+            // is no work.
+            no_skills_listed: result.no_skills_listed === true
+        });
     }catch(err){
         next(err);
     }

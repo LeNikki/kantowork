@@ -38,18 +38,68 @@ const SELECT_JOB = `
 
 const GROUP_BY = ' GROUP BY j.id, u.name ';
 
-// The board every worker sees: open jobs only, newest first.
-const listOpen = ({limit, offset}) => {
+/**
+ * The conditions behind the board's filters, built once and used by both the
+ * page query and the count so the two can never disagree about what is being
+ * counted.
+ *
+ * Every value goes in as a parameter. The only strings this assembles are the
+ * fragments below, which are fixed - nothing a caller sends becomes SQL.
+ *
+ * The skill tests are EXISTS subqueries rather than conditions on the join
+ * above: that join is there to aggregate every skill a job has, and filtering
+ * it would leave each job listing only the skills that were searched for.
+ */
+const buildJobFilters = ({skillIds, location, q, matchSkillIds}) => {
+    const conditions = [`j.status = 'open'`];
+    const params = [];
+
+    if(skillIds && skillIds.length > 0){
+        params.push(skillIds);
+        conditions.push(`EXISTS (SELECT 1 FROM kantowork.job_skills f
+                                  WHERE f.job_id = j.id AND f.skill_id = ANY($${params.length}::int[]))`);
+    }
+
+    // A worker asking for work they can do. Same shape as the filter above,
+    // with the list coming from their own skills rather than from the form.
+    if(matchSkillIds){
+        params.push(matchSkillIds);
+        conditions.push(`EXISTS (SELECT 1 FROM kantowork.job_skills m
+                                  WHERE m.job_id = j.id AND m.skill_id = ANY($${params.length}::int[]))`);
+    }
+
+    if(location){
+        params.push(`%${location}%`);
+        conditions.push(`j.location ILIKE $${params.length}`);
+    }
+
+    if(q){
+        params.push(`%${q}%`);
+        conditions.push(`(j.title ILIKE $${params.length} OR j.description ILIKE $${params.length})`);
+    }
+
+    return {where: `WHERE ${conditions.join(' AND ')}`, params};
+};
+
+// The board: open jobs, newest first, narrowed by whatever was asked for.
+const listOpen = ({limit, offset, ...filters}) => {
+    const {where, params} = buildJobFilters(filters);
     return pool.query(
-        `${SELECT_JOB} WHERE j.status = 'open' ${GROUP_BY}
+        `${SELECT_JOB} ${where} ${GROUP_BY}
           ORDER BY j.created_at DESC
-          LIMIT $1 OFFSET $2`,
-        [limit, offset]
+          LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+        [...params, limit, offset]
     );
 };
 
-const countOpen = () => {
-    return pool.query(`SELECT count(*)::int AS total FROM kantowork.jobs WHERE status = 'open'`);
+// Counted through the same conditions, so "page 1 of 3" is 3 pages of the
+// jobs actually being shown.
+const countOpen = (filters = {}) => {
+    const {where, params} = buildJobFilters(filters);
+    return pool.query(
+        `SELECT count(*)::int AS total FROM kantowork.jobs j ${where}`,
+        params
+    );
 };
 
 // A client's own jobs, every status - they need to see the cancelled ones too.

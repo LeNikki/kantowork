@@ -66,6 +66,17 @@ class WorkerProfile {
     }
 
     /**
+     * A row in the directory: enough to scan and compare, and no more. The
+     * services and the portfolio are left out rather than sent empty, for the
+     * same reason as below - the directory never gathers them, and an empty
+     * list would claim the worker has none.
+     */
+    toSummary(){
+        const {services, portfolio, ...summary} = this.toPublic();
+        return summary;
+    }
+
+    /**
      * The worker's own view: their contact details are theirs to see, but the
      * services and the portfolio are left out rather than sent empty. Only the
      * public profile gathers those, and an empty list here would read as "you

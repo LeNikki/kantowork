@@ -11,6 +11,7 @@ router.get('/', function(req, res, next) {
       'POST /api/auth/login',
       'GET  /api/users',
       'GET  /api/skills',
+      'GET  /api/workers',
       'GET  /api/workers/:id',
       'GET  /api/workers/me/profile',
       'PUT  /api/workers/me/profile',

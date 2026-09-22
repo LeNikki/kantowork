@@ -64,6 +64,17 @@ export type PublicWorker = Omit<WorkerProfile, 'email' | 'phone'> & {
   portfolio: PortfolioProject[]
 }
 
+// A row in the directory: what a client scans before clicking through. The
+// services and the portfolio are not in it - the full profile carries those.
+export type WorkerSummary = Omit<PublicWorker, 'services' | 'portfolio'>
+
+export type WorkerPage = {
+  workers: WorkerSummary[]
+  total: number
+  limit: number
+  offset: number
+}
+
 export type JobStatus = 'open' | 'assigned' | 'completed' | 'cancelled'
 export type BudgetType = 'fixed' | 'hourly'
 
@@ -86,7 +97,26 @@ export type Job = {
   skills: Skill[]
 }
 
-export type JobPage = { jobs: Job[]; total: number; limit: number; offset: number }
+export type JobPage = {
+  jobs: Job[]
+  total: number
+  limit: number
+  offset: number
+  // True when the server narrowed the board to work this caller can do.
+  matching: boolean
+  // True only for a worker who has listed no skills, so an empty matched
+  // list can say why rather than implying there is no work.
+  no_skills_listed: boolean
+}
+
+// What the board and the directory are narrowed by. All optional, and an
+// empty value means "do not narrow by this".
+export type SearchFilters = {
+  q?: string
+  location?: string
+  skill_ids?: number[]
+  mine?: boolean
+}
 
 export type ApplicationStatus = 'pending' | 'accepted' | 'rejected' | 'withdrawn'
 

@@ -9,6 +9,10 @@ var {workerProfileValidator, workerSkillsValidator} = require('../validators/pro
 var offeringController = require('../controllers/offeringController');
 var {offeringValidator, portfolioValidator} = require('../validators/offeringValidators');
 
+// The directory. Signed in only, like the job board: these are members'
+// profiles, not a page for the open web to crawl.
+router.get('/', requireAuth, workerController.list);
+
 // A worker's own profile. requireRole keeps a client out: they have a profile
 // too, but it is a different shape and lives under /api/clients.
 router.get('/me/profile',

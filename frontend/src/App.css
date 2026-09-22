@@ -388,6 +388,51 @@ a { color: var(--link); }
   font-size: 1.2rem;
 }
 
+/* ---- searching a listing ---- */
+/* The fields sit in a row where there is room and stack when there is not.
+   The actions take a whole row of their own, so the buttons do not end up
+   squeezed against the last field. */
+.search {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  align-items: end;
+  gap: .8rem;
+  margin: 1.5rem 0;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.search label { display: flex; flex-direction: column; gap: .3rem; }
+.search label > span { font-size: .85rem; font-weight: 600; }
+.search input,
+.search select {
+  padding: .5rem .65rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--ground);
+  color: var(--ink);
+  font: inherit;
+}
+.search-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .8rem;
+}
+
+/* A checkbox that reads as a sentence, so it keeps its box beside the words
+   rather than stacking like the fields above. */
+.switch {
+  flex-direction: row !important;
+  align-items: center;
+  gap: .4rem;
+  font-size: .9rem;
+  cursor: pointer;
+}
+.switch input { width: auto; cursor: pointer; }
+
 /* ---- landing ---- */
 .hero { padding: 5rem 0 4rem; max-width: 34rem; }
 .hero h1 {

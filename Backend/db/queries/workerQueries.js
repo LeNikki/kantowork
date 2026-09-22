@@ -106,7 +106,87 @@ const findPublicProfileById = (id) => {
     );
 };
 
+/**
+ * The directory: workers, narrowed by whatever a client searched for.
+ *
+ * Same shape as the job board's filters and the same reasoning - values go in
+ * as parameters, only fixed fragments are assembled, and the skill test is an
+ * EXISTS subquery so it cannot interfere with the skills each worker lists.
+ */
+const buildWorkerFilters = ({skillIds, location, q}) => {
+    const conditions = [`u.role = 'worker'`];
+    const params = [];
+
+    if(skillIds && skillIds.length > 0){
+        params.push(skillIds);
+        conditions.push(`EXISTS (SELECT 1 FROM kantowork.worker_skills f
+                                  WHERE f.worker_id = u.id AND f.skill_id = ANY($${params.length}::int[]))`);
+    }
+
+    if(location){
+        params.push(`%${location}%`);
+        conditions.push(`p.location ILIKE $${params.length}`);
+    }
+
+    if(q){
+        params.push(`%${q}%`);
+        conditions.push(`(u.name ILIKE $${params.length} OR p.headline ILIKE $${params.length}
+                          OR p.bio ILIKE $${params.length})`);
+    }
+
+    return {where: `WHERE ${conditions.join(' AND ')}`, params};
+};
+
+const SELECT_WORKER_SUMMARY = `
+    SELECT u.id AS user_id,
+           u.name,
+           p.headline,
+           p.location,
+           p.years_experience,
+           p.hourly_rate,
+           COALESCE(
+               json_agg(
+                   json_build_object('id', s.id, 'name', s.name, 'category', s.category)
+                   ORDER BY s.category, s.name
+               ) FILTER (WHERE s.id IS NOT NULL),
+               '[]'
+           ) AS skills
+      FROM kantowork.users u
+      LEFT JOIN kantowork.worker_profiles p ON p.user_id = u.id
+      LEFT JOIN kantowork.worker_skills ws  ON ws.worker_id = u.id
+      LEFT JOIN kantowork.skills s          ON s.id = ws.skill_id
+`;
+
+/**
+ * Workers who have said something about themselves come first: a page of
+ * blank names helps nobody decide. After that it is alphabetical, which at
+ * least does not change between refreshes.
+ */
+const listWorkers = ({limit, offset, ...filters}) => {
+    const {where, params} = buildWorkerFilters(filters);
+    return pool.query(
+        `${SELECT_WORKER_SUMMARY} ${where}
+          GROUP BY u.id, u.name, p.headline, p.location, p.years_experience, p.hourly_rate
+          ORDER BY (p.headline IS NULL OR p.headline = ''), u.name
+          LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+        [...params, limit, offset]
+    );
+};
+
+const countWorkers = (filters = {}) => {
+    const {where, params} = buildWorkerFilters(filters);
+    return pool.query(
+        `SELECT count(DISTINCT u.id)::int AS total
+           FROM kantowork.users u
+           LEFT JOIN kantowork.worker_profiles p ON p.user_id = u.id
+           ${where}`,
+        params
+    );
+};
+
 module.exports = {
+    listWorkers,
+    countWorkers,
     findProfileByUserId,
     upsertProfile,
     findSkillsByWorkerId,

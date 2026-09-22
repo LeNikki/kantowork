@@ -19,6 +19,7 @@ import MyJobs from './pages/client/MyJobs'
 import PostJob from './pages/client/PostJob'
 import EditJob from './pages/client/EditJob'
 import JobApplications from './pages/client/JobApplications'
+import BrowseWorkers from './pages/client/BrowseWorkers'
 import MyApplications from './pages/worker/MyApplications'
 import Services from './pages/worker/Services'
 import Portfolio from './pages/worker/Portfolio'
@@ -85,6 +86,7 @@ export default function App() {
           <Route path="/client/jobs/new" element={<PostJob />} />
           <Route path="/client/jobs/:id/edit" element={<EditJob />} />
           <Route path="/client/jobs/:id/applications" element={<JobApplications />} />
+          <Route path="/client/workers" element={<BrowseWorkers />} />
         </Route>
       </Route>
 

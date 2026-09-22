@@ -16,6 +16,7 @@ export default function ClientDashboard() {
       <p className="form-actions">
         <Link className="btn" to="/client/jobs/new">Post a job</Link>
         <Link className="btn btn-quiet" to="/client/jobs">Your jobs</Link>
+        <Link className="btn btn-quiet" to="/client/workers">Find a worker</Link>
         <Link className="btn btn-quiet" to="/client/profile">Edit your profile</Link>
       </p>
     </main>

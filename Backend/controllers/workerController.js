@@ -1,5 +1,36 @@
 const workerService = require('../services/workerService');
 
+// The same page and filter reading as the job board, for the same reason: a
+// nonsensical filter shows the directory rather than an error.
+const pageOf = (query)=>{
+    const limit = Math.min(Math.max(parseInt(query.limit, 10) || 20, 1), 50);
+    const offset = Math.max(parseInt(query.offset, 10) || 0, 0);
+    return {limit, offset};
+};
+
+const filtersOf = (query)=>{
+    const skillIds = String(query.skill_ids ?? '')
+        .split(',')
+        .map((id) => parseInt(id, 10))
+        .filter((id) => Number.isInteger(id) && id > 0);
+
+    const trim = (value) => String(value ?? '').trim().slice(0, 120);
+
+    return {skillIds, location: trim(query.location), q: trim(query.q)};
+};
+
+// Every worker, for a client with work to give out. Summaries only - the full
+// profile, with the portfolio, is a click away.
+const list = async (req, res, next)=>{
+    try{
+        const page = pageOf(req.query);
+        const {workers, total} = await workerService.listWorkers({...page, ...filtersOf(req.query)});
+        res.json({workers: workers.map((w) => w.toSummary()), total, ...page});
+    }catch(err){
+        next(err);
+    }
+};
+
 const getOwnProfile = async (req, res, next)=>{
     try{
         const profile = await workerService.getOwnProfile(req.user.id);
@@ -50,4 +81,4 @@ const getPublicProfile = async (req, res, next)=>{
     }
 };
 
-module.exports = {getOwnProfile, saveOwnProfile, saveOwnSkills, getPublicProfile};
+module.exports = {list, getOwnProfile, saveOwnProfile, saveOwnSkills, getPublicProfile};
