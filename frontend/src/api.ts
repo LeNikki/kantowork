@@ -25,9 +25,44 @@ export type WorkerProfile = {
   skills: Skill[]
 }
 
-// What /api/workers/:id returns - the same profile with the contact details
-// left out. A worker gives those out once they are chosen, not before.
-export type PublicWorker = Omit<WorkerProfile, 'email' | 'phone'>
+// How a trade quotes: by the job, the hour, the day, or the square metre.
+export type RateUnit = 'job' | 'hour' | 'day' | 'sqm'
+
+// One thing a worker offers, priced. The API calls these services, which is
+// the word a worker uses.
+export type ServiceOffering = {
+  id: number
+  worker_id: number
+  title: string
+  description: string
+  rate: number | null
+  rate_unit: RateUnit
+  position: number
+}
+
+// A picture is a web address, not a file: nothing here uploads anything, so
+// a worker points at an image hosted elsewhere.
+export type PortfolioImage = { id: number; url: string; caption: string }
+
+export type PortfolioProject = {
+  id: number
+  worker_id: number
+  title: string
+  description: string
+  completed_on: string | null
+  position: number
+  images: PortfolioImage[]
+}
+
+/**
+ * What /api/workers/:id returns: the profile with the contact details left
+ * out - a worker gives those out once they are chosen - and with everything
+ * that speaks for them added. This is the page a client decides on.
+ */
+export type PublicWorker = Omit<WorkerProfile, 'email' | 'phone'> & {
+  services: ServiceOffering[]
+  portfolio: PortfolioProject[]
+}
 
 export type JobStatus = 'open' | 'assigned' | 'completed' | 'cancelled'
 export type BudgetType = 'fixed' | 'hourly'

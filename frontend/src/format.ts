@@ -1,4 +1,4 @@
-import type { Job } from './api'
+import type { Job, RateUnit } from './api'
 
 // Money always reads with two decimal places. A bare "450.5" looks like a typo
 // rather than an amount.
@@ -31,3 +31,15 @@ export const formatDate = (iso: string) => {
     year: 'numeric', month: 'short', day: 'numeric',
   })
 }
+
+const RATE_UNITS: Record<RateUnit, string> = {
+  job: 'per job',
+  hour: 'per hour',
+  day: 'per day',
+  sqm: 'per m²',
+}
+
+// A service may be offered without a price - plenty of work cannot be quoted
+// until it has been looked at, and an empty rate says exactly that.
+export const formatRate = (rate: number | null, unit: RateUnit) =>
+  rate === null ? 'Price on asking' : `${formatMoney(rate)} ${RATE_UNITS[unit]}`

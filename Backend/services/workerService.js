@@ -1,6 +1,8 @@
 const WorkerProfile = require('../models/workerProfile');
 const workerQueries = require('../db/queries/workerQueries');
 const skillQueries = require('../db/queries/skillQueries');
+const offeringService = require('./offeringService');
+const portfolioService = require('./portfolioService');
 
 const getOwnProfile = async (userId)=>{
     const result = await workerQueries.findProfileByUserId(userId);
@@ -18,13 +20,27 @@ const saveOwnProfile = async (userId, fields)=>{
     return getOwnProfile(userId);
 };
 
+/**
+ * A worker as a client sees them: the profile, what they can do, what they
+ * offer and what they have built. This is the page a client decides on, so
+ * everything that speaks for the worker is on it.
+ *
+ * The three lists are fetched together - none depends on the others.
+ */
 const getPublicProfile = async (id)=>{
     const result = await workerQueries.findPublicProfileById(id);
     if(result.rows.length === 0){
         throw new Error('Worker not found');
     }
-    const skills = await workerQueries.findSkillsByWorkerId(id);
-    return WorkerProfile.fromRow(result.rows[0]).withSkills(skills.rows);
+    const [skills, offerings, portfolio] = await Promise.all([
+        workerQueries.findSkillsByWorkerId(id),
+        offeringService.listForWorker(id),
+        portfolioService.listForWorker(id)
+    ]);
+    return WorkerProfile.fromRow(result.rows[0])
+        .withSkills(skills.rows)
+        .withOfferings(offerings)
+        .withPortfolio(portfolio);
 };
 
 /**

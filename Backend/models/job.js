@@ -1,23 +1,7 @@
-/**
- * A job posting.
- *
- * The two budget bounds get the same treatment the worker's hourly rate does:
- * pg hands NUMERIC back as a string to protect precision, and an amount this
- * size is safe as a number. A null bound stays null - it means the client did
- * not say, which is different from zero.
- *
- * deadline is a DATE, and pg turns it into a JS Date in the server's zone.
- * Sent on as an ISO date string, the day cannot drift a step either way when
- * the client and server sit in different zones.
- */
-const toNumber = (value) => (value === null || value === undefined ? null : Number(value));
-const toDateString = (value) => {
-    if (!value) return null;
-    // A Date from pg for a DATE column is midnight local, so the local parts
-    // are the date that was stored - reading them in UTC could be yesterday.
-    const pad = (n) => String(n).padStart(2, '0');
-    return `${value.getFullYear()}-${pad(value.getMonth() + 1)}-${pad(value.getDate())}`;
-};
+const {toNumber, toDateString} = require('../lib/values');
+
+// A job posting. Its budget bounds and its deadline are both normalised on
+// the way out - lib/values says why each one needs it.
 
 class Job {
     constructor(row){

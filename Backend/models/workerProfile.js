@@ -1,14 +1,11 @@
+const {toNumber} = require('../lib/values');
+
 /**
  * A worker's profile, joined onto their user row.
  *
- * Two things are normalised here rather than in the queries:
- *
- * - pg hands back NUMERIC as a string, to avoid silently losing precision on
- *   values that do not fit a float. An hourly rate is small enough to be safe
- *   as a number, and the frontend would otherwise have to parse it.
- * - A worker who has not saved yet has NULL for every profile column. The
- *   empty string is kinder to a form than null, so text fields come back as
- *   ''. The two numbers stay null: 0 years and no answer are different.
+ * A worker who has not saved yet has NULL for every profile column. The empty
+ * string is kinder to a form than null, so text fields come back as ''. The
+ * two numbers stay null: 0 years and no answer are different.
  */
 class WorkerProfile {
     constructor(row){
@@ -19,11 +16,13 @@ class WorkerProfile {
         this.bio              = row.bio ?? '';
         this.location         = row.location ?? '';
         this.years_experience = row.years_experience ?? null;
-        this.hourly_rate      = row.hourly_rate === null || row.hourly_rate === undefined
-            ? null
-            : Number(row.hourly_rate);
+        this.hourly_rate      = toNumber(row.hourly_rate);
         this.phone            = row.phone ?? '';
         this.skills           = [];
+        // Filled in by the caller, and only for the public profile - the
+        // worker's own edit pages fetch these separately, one form each.
+        this.services         = [];
+        this.portfolio        = [];
     }
 
     static fromRow(row){
@@ -32,6 +31,16 @@ class WorkerProfile {
 
     withSkills(skills){
         this.skills = skills;
+        return this;
+    }
+
+    withOfferings(offerings){
+        this.services = offerings.map((o) => o.toPublic());
+        return this;
+    }
+
+    withPortfolio(projects){
+        this.portfolio = projects.map((p) => p.toPublic());
         return this;
     }
 
@@ -50,14 +59,21 @@ class WorkerProfile {
             location:         this.location,
             years_experience: this.years_experience,
             hourly_rate:      this.hourly_rate,
-            skills:           this.skills
+            skills:           this.skills,
+            services:         this.services,
+            portfolio:        this.portfolio
         };
     }
 
-    // The worker's own view of their profile - everything, contact details
-    // included, since it is theirs.
+    /**
+     * The worker's own view: their contact details are theirs to see, but the
+     * services and the portfolio are left out rather than sent empty. Only the
+     * public profile gathers those, and an empty list here would read as "you
+     * have none" when the truth is "nobody asked for them".
+     */
     toOwn(){
-        return {...this.toPublic(), email: this.email, phone: this.phone};
+        const {services, portfolio, ...profile} = this.toPublic();
+        return {...profile, email: this.email, phone: this.phone};
     }
 }
 

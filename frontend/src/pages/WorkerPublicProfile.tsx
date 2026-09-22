@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import type { PublicWorker } from '../api'
 import { workerService } from '../services/workerService'
-import { formatMoney } from '../format'
+import { formatDate, formatMoney, formatRate } from '../format'
+import Gallery from '../components/Gallery'
 
 /**
  * A worker as everyone else sees them: no email, no phone. A worker reaches it
@@ -49,7 +50,42 @@ export default function WorkerPublicProfile() {
 
       {worker.bio && <p className="bio">{worker.bio}</p>}
 
-      {!worker.headline && !worker.bio && facts.length === 0 && worker.skills.length === 0 && (
+      {worker.services.length > 0 && (
+        <section>
+          <h2>What they offer</h2>
+          <div className="jobs">
+            {worker.services.map((service) => (
+              <article key={service.id} className="job">
+                <h2>{service.title}</h2>
+                <p className="muted">{formatRate(service.rate, service.rate_unit)}</p>
+                {service.description && <p>{service.description}</p>}
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {worker.portfolio.length > 0 && (
+        <section>
+          <h2>Work they have finished</h2>
+          <div className="jobs">
+            {worker.portfolio.map((project) => (
+              <article key={project.id} className="job">
+                <h2>{project.title}</h2>
+                {project.completed_on && (
+                  <p className="muted">Finished {formatDate(project.completed_on)}</p>
+                )}
+                {project.description && <p>{project.description}</p>}
+                <Gallery images={project.images} />
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Nothing at all to show, rather than a page of empty headings. */}
+      {!worker.headline && !worker.bio && facts.length === 0 && worker.skills.length === 0
+        && worker.services.length === 0 && worker.portfolio.length === 0 && (
         <p className="muted">This worker has not filled in their profile yet.</p>
       )}
     </main>

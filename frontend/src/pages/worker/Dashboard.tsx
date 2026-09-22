@@ -17,6 +17,8 @@ export default function WorkerDashboard() {
         <Link className="btn" to="/jobs">Find work</Link>
         <Link className="btn btn-quiet" to="/worker/applications">Your applications</Link>
         <Link className="btn btn-quiet" to="/worker/profile">Edit your profile</Link>
+        <Link className="btn btn-quiet" to="/worker/portfolio">Your portfolio</Link>
+        <Link className="btn btn-quiet" to="/worker/services">What you offer</Link>
       </p>
     </main>
   )

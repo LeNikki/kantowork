@@ -20,6 +20,8 @@ import PostJob from './pages/client/PostJob'
 import EditJob from './pages/client/EditJob'
 import JobApplications from './pages/client/JobApplications'
 import MyApplications from './pages/worker/MyApplications'
+import Services from './pages/worker/Services'
+import Portfolio from './pages/worker/Portfolio'
 import './App.css'
 
 /**
@@ -71,6 +73,8 @@ export default function App() {
           <Route path="/worker" element={<WorkerDashboard />} />
           <Route path="/worker/profile" element={<WorkerProfileEdit />} />
           <Route path="/worker/applications" element={<MyApplications />} />
+          <Route path="/worker/services" element={<Services />} />
+          <Route path="/worker/portfolio" element={<Portfolio />} />
         </Route>
 
         {/* the client's side - a worker who comes here is sent back */}
