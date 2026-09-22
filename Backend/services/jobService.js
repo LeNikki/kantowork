@@ -110,4 +110,4 @@ const remove = async (id, clientId)=>{
     await jobQueries.remove(id);
 };
 
-module.exports = {getById, listOpen, listMine, create, update, changeStatus, remove};
+module.exports = {getById, getOwnedById, listOpen, listMine, create, update, changeStatus, remove};

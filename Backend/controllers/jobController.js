@@ -1,4 +1,6 @@
 const jobService = require('../services/jobService');
+const applicationService = require('../services/applicationService');
+const {ROLES} = require('../config/roles');
 
 // Shared by both listings. A caller may ask for a page of up to 50; anything
 // larger, smaller or unparseable falls back to the default rather than being
@@ -39,10 +41,29 @@ const listMine = async (req, res, next)=>{
     }
 };
 
+/**
+ * The posting, plus the one extra thing the caller needs to know about it.
+ *
+ * A worker gets their own application, or null - without it the page cannot
+ * tell "apply" from "you already did", and would have to guess or ask again.
+ * The client who posted it gets the number of applications waiting. Neither
+ * side is told anything about the other's.
+ */
 const get = async (req, res, next)=>{
     try{
-        const job = await jobService.getById(Number(req.params.id));
-        res.json({job: job.toPublic()});
+        const id = Number(req.params.id);
+        const job = await jobService.getById(id);
+        const payload = {job: job.toPublic()};
+
+        if(req.user.role === ROLES.WORKER){
+            const mine = await applicationService.findMineForJob(id, req.user.id);
+            payload.my_application = mine === null ? null : mine.toPublic();
+        }
+        if(job.client_id === req.user.id){
+            payload.application_count = await applicationService.countForJob(id);
+        }
+
+        res.json(payload);
     }catch(err){
         if(err.message === 'Job not found'){
             return res.status(404).json({error: err.message});

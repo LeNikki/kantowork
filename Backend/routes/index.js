@@ -24,6 +24,11 @@ router.get('/', function(req, res, next) {
       'PUT  /api/jobs/:id',
       'PATCH /api/jobs/:id',
       'DELETE /api/jobs/:id',
+      'POST /api/jobs/:id/applications',
+      'GET  /api/jobs/:id/applications',
+      'GET  /api/applications/me',
+      'PATCH /api/applications/:id',
+      'POST /api/applications/:id/withdraw',
     ],
   });
 });

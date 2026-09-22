@@ -38,7 +38,9 @@ export default function JobBoard() {
       {error && <p className="error">{error}</p>}
 
       {jobs.length === 0
-        ? <p className="muted">No jobs have been posted yet. Check back soon.</p>
+        // Not "nothing has been posted" - jobs that are taken or finished are
+        // off this board, and saying otherwise would be wrong.
+        ? <p className="muted">No jobs are open right now. Check back soon.</p>
         : <>
             <p className="muted">{total} open {total === 1 ? 'job' : 'jobs'}.</p>
             <JobList jobs={jobs} />

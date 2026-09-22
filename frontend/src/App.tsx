@@ -18,6 +18,8 @@ import JobDetail from './pages/JobDetail'
 import MyJobs from './pages/client/MyJobs'
 import PostJob from './pages/client/PostJob'
 import EditJob from './pages/client/EditJob'
+import JobApplications from './pages/client/JobApplications'
+import MyApplications from './pages/worker/MyApplications'
 import './App.css'
 
 /**
@@ -68,6 +70,7 @@ export default function App() {
         <Route element={<RoleGuard allow={['worker']} />}>
           <Route path="/worker" element={<WorkerDashboard />} />
           <Route path="/worker/profile" element={<WorkerProfileEdit />} />
+          <Route path="/worker/applications" element={<MyApplications />} />
         </Route>
 
         {/* the client's side - a worker who comes here is sent back */}
@@ -77,6 +80,7 @@ export default function App() {
           <Route path="/client/jobs" element={<MyJobs />} />
           <Route path="/client/jobs/new" element={<PostJob />} />
           <Route path="/client/jobs/:id/edit" element={<EditJob />} />
+          <Route path="/client/jobs/:id/applications" element={<JobApplications />} />
         </Route>
       </Route>
 

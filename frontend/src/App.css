@@ -69,6 +69,14 @@ a { color: var(--link); }
 }
 
 .page { padding: 3rem 0; }
+/* A page title may carry a status badge beside it. Flex gives the two a gap
+   and lets the badge drop to the next line when the title is long. */
+.page h1 {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .6rem;
+}
 
 /* ---- auth forms ---- */
 .card {
@@ -296,6 +304,35 @@ a { color: var(--link); }
   margin-top: 1.5rem;
 }
 .pager button:disabled { opacity: .5; cursor: default; }
+
+/* ---- applications ---- */
+/* A block that is about the reader rather than about the job: a worker's own
+   application, or the form that makes one. */
+.panel {
+  max-width: 42rem;
+  margin: 2rem 0;
+  padding: 1.2rem 1.4rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+.panel h2 {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin: 0 0 .5rem;
+  font-size: 1.05rem;
+}
+.panel .form { margin-top: 1rem; }
+.panel .bio { margin-bottom: 1rem; }
+
+.badge-pending { background: var(--highlight); color: var(--ink); }
+.badge-accepted { background: var(--accent); color: var(--accent-ink); }
+.badge-rejected, .badge-withdrawn {
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--muted-ink);
+}
 
 /* ---- landing ---- */
 .hero { padding: 5rem 0 4rem; max-width: 34rem; }

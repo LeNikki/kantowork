@@ -53,6 +53,34 @@ export type Job = {
 
 export type JobPage = { jobs: Job[]; total: number; limit: number; offset: number }
 
+export type ApplicationStatus = 'pending' | 'accepted' | 'rejected' | 'withdrawn'
+
+export type Application = {
+  id: number
+  job_id: number
+  job_title: string
+  job_status: JobStatus
+  worker_id: number
+  worker_name: string
+  worker_headline: string
+  cover_message: string
+  proposed_amount: number | null
+  status: ApplicationStatus
+  created_at: string
+}
+
+/**
+ * A posting plus whichever extra the caller is entitled to: a worker gets
+ * their own application (null if they have not applied), the client who
+ * posted it gets how many are waiting. Neither field is present for the
+ * other side, so both are optional here.
+ */
+export type JobDetail = {
+  job: Job
+  my_application?: Application | null
+  application_count?: number
+}
+
 export type ClientProfile = {
   user_id: number
   name: string

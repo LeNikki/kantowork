@@ -11,7 +11,7 @@ export default function EditJob() {
 
   useEffect(() => {
     jobService.get(Number(id))
-      .then((job) => setInitial({
+      .then(({ job }) => setInitial({
         title: job.title,
         description: job.description,
         location: job.location,

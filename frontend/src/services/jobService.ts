@@ -1,4 +1,4 @@
-import { api, type Job, type JobPage, type JobStatus } from '../api'
+import { api, type Job, type JobDetail, type JobPage, type JobStatus } from '../api'
 
 // What the job form sends. Numbers and the date leave the form as strings,
 // and '' is a field the client left blank - the API turns both into null.
@@ -33,7 +33,9 @@ export const jobService = {
   // cancelled ones too.
   mine: (page: Page = {}) => api<JobPage>(`/api/jobs/mine${query(page)}`),
 
-  get: (id: number) => api<{ job: Job }>(`/api/jobs/${id}`).then((r) => r.job),
+  // The whole reply, not just the job: what else comes back depends on who
+  // is asking, and the pages need it.
+  get: (id: number) => api<JobDetail>(`/api/jobs/${id}`),
 
   create: (input: JobInput) =>
     api<{ job: Job }>('/api/jobs', input, 'POST').then((r) => r.job),
