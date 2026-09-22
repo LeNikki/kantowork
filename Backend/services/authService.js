@@ -4,14 +4,16 @@ const userQueries = require('../db/queries/userQueries');
 
 const SALT_ROUNDS = 10;
 
-const signup = async (name, email, password)=>{
+const signup = async (name, email, password, role)=>{
     const existingUser = await userQueries.findByEmail(email);
     if(existingUser.rows.length > 0){
         throw new Error('Email already registered');
     }
 
+    // The role arrives already checked against SIGNUP_ROLES by the validator,
+    // and the CHECK constraint on the column is the backstop behind that.
     const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
-    const result = await userQueries.createUser(name, email, password_hash, 'user');
+    const result = await userQueries.createUser(name, email, password_hash, role);
 
     return User.fromRow(result.rows[0]);
 };

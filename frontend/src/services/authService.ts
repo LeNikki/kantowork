@@ -1,4 +1,4 @@
-import { api, setToken, clearToken, type AuthResponse, type User } from '../api'
+import { api, setToken, clearToken, type AuthResponse, type SignupRole, type User } from '../api'
 
 /**
  * Every /api/auth endpoint, in one place.
@@ -7,8 +7,8 @@ import { api, setToken, clearToken, type AuthResponse, type User } from '../api'
  * logging out clears it, so no page has to remember to do it.
  */
 export const authService = {
-  signup: async (name: string, email: string, password: string) => {
-    const res = await api<AuthResponse>('/api/auth/signup', { name, email, password })
+  signup: async (name: string, email: string, password: string, role: SignupRole) => {
+    const res = await api<AuthResponse>('/api/auth/signup', { name, email, password, role })
     setToken(res.token)
     return res.user
   },
