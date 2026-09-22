@@ -8,6 +8,37 @@ export type SignupRole = Extract<Role, 'worker' | 'client'>
 export type User = { id: number; name: string; email: string; role: Role }
 export type AuthResponse = { message: string; user: User; token: string; expiresIn: string }
 
+export type Skill = { id: number; name: string; category: string }
+
+// Field names are the API's, which are the database's. Nothing translates
+// between the two, so there is nothing to keep in step.
+export type WorkerProfile = {
+  user_id: number
+  name: string
+  email: string
+  headline: string
+  bio: string
+  location: string
+  years_experience: number | null
+  hourly_rate: number | null
+  phone: string
+  skills: Skill[]
+}
+
+// What /api/workers/:id returns - the same profile with the contact details
+// left out. A worker gives those out once they are chosen, not before.
+export type PublicWorker = Omit<WorkerProfile, 'email' | 'phone'>
+
+export type ClientProfile = {
+  user_id: number
+  name: string
+  email: string
+  company: string
+  about: string
+  location: string
+  phone: string
+}
+
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
 export const getToken = () => localStorage.getItem(TOKEN_KEY)

@@ -1,4 +1,4 @@
-import { useOutletContext } from 'react-router-dom'
+import { Link, useOutletContext } from 'react-router-dom'
 import type { User } from '../../api'
 
 export default function WorkerDashboard() {
@@ -11,6 +11,10 @@ export default function WorkerDashboard() {
       <p>
         This is your side of kantowork: your profile and portfolio live here,
         and this is where you will find jobs to apply for.
+      </p>
+
+      <p>
+        <Link className="btn" to="/worker/profile">Edit your profile</Link>
       </p>
     </main>
   )

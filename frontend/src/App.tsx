@@ -9,7 +9,10 @@ import Landing from './pages/Landing'
 import Login from './pages/user/auth/Login'
 import Signup from './pages/user/auth/Signup'
 import WorkerDashboard from './pages/worker/Dashboard'
+import WorkerProfileEdit from './pages/worker/ProfileEdit'
 import ClientDashboard from './pages/client/Dashboard'
+import ClientProfileEdit from './pages/client/ProfileEdit'
+import WorkerPublicProfile from './pages/WorkerPublicProfile'
 import './App.css'
 
 /**
@@ -51,14 +54,19 @@ export default function App() {
       <Route element={<AuthLayout user={user} onLogout={() => setUser(null)} />}>
         <Route path="/dashboard" element={<DashboardHome />} />
 
+        {/* a worker as everyone else sees them - either role may look */}
+        <Route path="/workers/:id" element={<WorkerPublicProfile />} />
+
         {/* the worker's side - a client who comes here is sent back */}
         <Route element={<RoleGuard allow={['worker']} />}>
           <Route path="/worker" element={<WorkerDashboard />} />
+          <Route path="/worker/profile" element={<WorkerProfileEdit />} />
         </Route>
 
         {/* the client's side - a worker who comes here is sent back */}
         <Route element={<RoleGuard allow={['client']} />}>
           <Route path="/client" element={<ClientDashboard />} />
+          <Route path="/client/profile" element={<ClientProfileEdit />} />
         </Route>
       </Route>
 

@@ -10,6 +10,13 @@ router.get('/', function(req, res, next) {
       'POST /api/auth/signup',
       'POST /api/auth/login',
       'GET  /api/users',
+      'GET  /api/skills',
+      'GET  /api/workers/:id',
+      'GET  /api/workers/me/profile',
+      'PUT  /api/workers/me/profile',
+      'PUT  /api/workers/me/skills',
+      'GET  /api/clients/me/profile',
+      'PUT  /api/clients/me/profile',
     ],
   });
 });

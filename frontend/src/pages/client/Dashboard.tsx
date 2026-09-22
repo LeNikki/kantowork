@@ -1,4 +1,4 @@
-import { useOutletContext } from 'react-router-dom'
+import { Link, useOutletContext } from 'react-router-dom'
 import type { User } from '../../api'
 
 export default function ClientDashboard() {
@@ -11,6 +11,10 @@ export default function ClientDashboard() {
       <p>
         This is your side of kantowork: post the work you need doing, and
         review the skilled workers who apply for it.
+      </p>
+
+      <p>
+        <Link className="btn" to="/client/profile">Edit your profile</Link>
       </p>
     </main>
   )

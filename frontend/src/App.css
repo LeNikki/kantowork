@@ -156,6 +156,91 @@ a { color: var(--link); }
   background: var(--highlight);
 }
 
+/* ---- profile forms ---- */
+.lead { font-size: 1.15rem; margin: .2rem 0 .4rem; }
+.bio { line-height: 1.6; max-width: 42rem; white-space: pre-wrap; }
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  max-width: 42rem;
+  margin-top: 2rem;
+}
+.form label { display: flex; flex-direction: column; gap: .3rem; }
+.form label > span { font-size: .9rem; font-weight: 600; }
+.form input,
+.form textarea {
+  padding: .55rem .7rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+.form textarea { resize: vertical; line-height: 1.5; }
+/* Two to a row where there is space, stacked on a narrow screen. */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 1.1rem;
+}
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.skills { border: 0; padding: 0; margin: 0; }
+.skills legend { padding: 0; font-size: .9rem; font-weight: 600; }
+.skills-group { margin-top: 1rem; }
+.skills-group h2 {
+  margin: 0 0 .5rem;
+  font-size: .8rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--muted-ink);
+}
+.skills-list { display: flex; flex-wrap: wrap; gap: .5rem; }
+
+/* A skill reads as a tag, so the checkbox is hidden the same way the signup
+   radios are - visually only, still focusable and still announced. */
+.tag {
+  padding: .35rem .7rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  font-size: .9rem;
+  cursor: pointer;
+}
+.tag input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+}
+.tag:hover { border-color: var(--accent-soft); }
+.tag:has(input:focus-visible) {
+  outline: 2px solid var(--accent-soft);
+  outline-offset: 1px;
+}
+/* Chosen: filled, not merely tinted, so a glance is enough to read the set. */
+.tag-on, .tag-on:hover {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+/* The same tag where there is nothing to toggle, as on a public profile. */
+.tag-static {
+  background: var(--highlight);
+  border-color: var(--highlight);
+  cursor: default;
+}
+
 /* ---- landing ---- */
 .hero { padding: 5rem 0 4rem; max-width: 34rem; }
 .hero h1 {
