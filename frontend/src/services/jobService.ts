@@ -19,7 +19,7 @@ export type JobInput = {
 // cannot be hot-reloaded.
 export const EMPTY_JOB: JobInput = {
   title: '', description: '', location: '',
-  budget_type: 'fixed', budget_min: '', budget_max: '', deadline: '', skill_ids: [],
+  budget_type: 'job', budget_min: '', budget_max: '', deadline: '', skill_ids: [],
 }
 
 type Page = { limit?: number; offset?: number }

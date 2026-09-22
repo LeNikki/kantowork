@@ -5,6 +5,16 @@ import type { Job, RateUnit } from './api'
 export const formatMoney = (amount: number) =>
   `₱${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 
+// How a unit reads beside an amount. One list: a worker's rate and a client's
+// budget are the same kind of figure, so they are said the same way on both
+// sides of the board.
+const RATE_UNITS: Record<RateUnit, string> = {
+  job: 'per job',
+  hour: 'per hour',
+  day: 'per day',
+  sqm: 'per m²',
+}
+
 /**
  * A budget is a range, and either end may be missing - a client often knows
  * roughly what they will pay before they know exactly. Each combination gets
@@ -12,7 +22,10 @@ export const formatMoney = (amount: number) =>
  */
 export const formatBudget = (job: Pick<Job, 'budget_min' | 'budget_max' | 'budget_type'>) => {
   const { budget_min: min, budget_max: max, budget_type: type } = job
-  const per = type === 'hourly' ? ' / hour' : ''
+  // A range is quoted per unit as a whole: "800 - 1,200 per m²", not each end
+  // of it separately. 'Budget open' takes no unit - there is no amount for one
+  // to qualify.
+  const per = ` ${RATE_UNITS[type]}`
 
   if (min === null && max === null) return 'Budget open'
   if (min !== null && max !== null) {
@@ -30,13 +43,6 @@ export const formatDate = (iso: string) => {
   return new Date(year, month - 1, day).toLocaleDateString(undefined, {
     year: 'numeric', month: 'short', day: 'numeric',
   })
-}
-
-const RATE_UNITS: Record<RateUnit, string> = {
-  job: 'per job',
-  hour: 'per hour',
-  day: 'per day',
-  sqm: 'per m²',
 }
 
 // A service may be offered without a price - plenty of work cannot be quoted

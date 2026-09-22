@@ -1,5 +1,6 @@
 const {body} = require('express-validator');
 const {STATUSES} = require('../config/jobStatus');
+const {RATE_UNITS} = require('../config/rateUnits');
 
 // Same reasoning as the profile validators: a blank form field arrives as '',
 // which is not a number and not a date.
@@ -14,8 +15,11 @@ const jobValidator = [
         .isLength({max: 8000}).withMessage('Description must be 8000 characters or fewer'),
     body('location').optional({values: 'null'}).isString().trim()
         .isLength({max: 120}).withMessage('Location must be 120 characters or fewer'),
-    body('budget_type').optional({values: 'null'}).isIn(['fixed', 'hourly'])
-        .withMessage('Budget type must be fixed or hourly'),
+    // The same list a worker's service rate is checked against: a budget and a
+    // rate answer the same question, so a client may ask for work priced any
+    // way a worker may offer it.
+    body('budget_type').optional({values: 'null'}).isIn(RATE_UNITS)
+        .withMessage(`Budget type must be one of: ${RATE_UNITS.join(', ')}`),
     body('budget_min').customSanitizer(emptyToNull).optional({values: 'null'})
         .isFloat({min: 0, max: 100000000}).withMessage('Budget must be a positive amount').toFloat(),
     body('budget_max').customSanitizer(emptyToNull).optional({values: 'null'})

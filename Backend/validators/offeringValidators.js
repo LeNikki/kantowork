@@ -1,10 +1,7 @@
 const {body} = require('express-validator');
+const {RATE_UNITS} = require('../config/rateUnits');
 
 const emptyToNull = (value) => (value === '' ? null : value);
-
-// Trades quote by the job, the hour, the day, or the square metre. A rate with
-// no unit is the job, which the service fills in.
-const RATE_UNITS = ['job', 'hour', 'day', 'sqm'];
 
 const offeringValidator = [
     body('title').isString().trim().notEmpty().withMessage('Give the service a name')
@@ -45,4 +42,4 @@ const portfolioValidator = [
         .isLength({max: 200}).withMessage('A caption must be 200 characters or fewer')
 ];
 
-module.exports = {offeringValidator, portfolioValidator, RATE_UNITS};
+module.exports = {offeringValidator, portfolioValidator};

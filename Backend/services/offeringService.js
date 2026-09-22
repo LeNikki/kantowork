@@ -1,5 +1,6 @@
 const Offering = require('../models/offering');
 const serviceQueries = require('../db/queries/serviceQueries');
+const {DEFAULT_RATE_UNIT} = require('../config/rateUnits');
 
 /**
  * The services a worker offers - "offerings" in the code, for the reason
@@ -33,7 +34,7 @@ const getOwnedById = async (id, workerId)=>{
  */
 const withDefaults = (fields)=>({
     ...fields,
-    rate_unit: fields.rate_unit || 'job',
+    rate_unit: fields.rate_unit || DEFAULT_RATE_UNIT,
     position:  fields.position ?? 0
 });
 

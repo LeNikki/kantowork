@@ -26,6 +26,8 @@ export type WorkerProfile = {
 }
 
 // How a trade quotes: by the job, the hour, the day, or the square metre.
+// Mirrors config/rateUnits.js on the server, which mirrors the CHECK on both
+// services.rate_unit and jobs.budget_type.
 export type RateUnit = 'job' | 'hour' | 'day' | 'sqm'
 
 // One thing a worker offers, priced. The API calls these services, which is
@@ -76,7 +78,10 @@ export type WorkerPage = {
 }
 
 export type JobStatus = 'open' | 'assigned' | 'completed' | 'cancelled'
-export type BudgetType = 'fixed' | 'hourly'
+// A budget is quoted the way a service is - "per what?" - so it is the same
+// set, not a second one that can drift from it. A client may ask for tiling by
+// the square metre because a worker may offer it that way.
+export type BudgetType = RateUnit
 
 export type Job = {
   id: number

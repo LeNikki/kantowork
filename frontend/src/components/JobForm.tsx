@@ -102,8 +102,10 @@ export default function JobForm({
         <label>
           <span>Budget type</span>
           <select value={fields.budget_type} onChange={(e) => set('budget_type')(e.target.value)}>
-            <option value="fixed">A fixed price for the job</option>
-            <option value="hourly">An hourly rate</option>
+            <option value="job">A fixed price for the job</option>
+            <option value="hour">An hourly rate</option>
+            <option value="day">A day rate</option>
+            <option value="sqm">A rate per square metre</option>
           </select>
         </label>
 

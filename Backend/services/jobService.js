@@ -2,6 +2,7 @@ const Job = require('../models/job');
 const jobQueries = require('../db/queries/jobQueries');
 const skillQueries = require('../db/queries/skillQueries');
 const workerQueries = require('../db/queries/workerQueries');
+const {DEFAULT_RATE_UNIT} = require('../config/rateUnits');
 
 /**
  * Which status may follow which. A client cannot set 'assigned' by hand -
@@ -16,7 +17,7 @@ const NEXT_STATUS = {
 };
 
 /**
- * A budget with no type is a fixed price for the job - the common case, and
+ * A budget with no type is a price for the whole job - the common case, and
  * what the form offers first.
  *
  * The column has the same default, but a DEFAULT only applies when the column
@@ -24,7 +25,7 @@ const NEXT_STATUS = {
  * so an absent type arrives as an explicit NULL and the default never fires.
  * Filling it in here is what keeps "no budget type" from being a 500.
  */
-const withDefaults = (fields)=>({...fields, budget_type: fields.budget_type || 'fixed'});
+const withDefaults = (fields)=>({...fields, budget_type: fields.budget_type || DEFAULT_RATE_UNIT});
 
 const assertKnownSkills = async (skillIds)=>{
     const known = new Set((await skillQueries.listAll()).rows.map((s) => s.id));
