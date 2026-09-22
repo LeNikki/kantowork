@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import type { Skill } from '../../api'
 import { skillService } from '../../services/skillService'
 import { workerService, type WorkerProfileInput } from '../../services/workerService'
+import SkillPicker from '../../components/SkillPicker'
 
 const EMPTY: WorkerProfileInput = {
   headline: '', bio: '', location: '', years_experience: '', hourly_rate: '', phone: '',
@@ -74,10 +75,6 @@ export default function WorkerProfileEdit() {
   }
 
   if (loading) return <main className="page"><p>Loading…</p></main>
-
-  // Grouped for the form only - the API returns them already sorted by
-  // category, so this just walks the list and starts a new group at each turn.
-  const categories = [...new Set(vocabulary.map((s) => s.category))]
 
   return (
     <main className="page">
@@ -156,29 +153,12 @@ export default function WorkerProfileEdit() {
           </label>
         </div>
 
-        <fieldset className="skills">
-          <legend>What you can do</legend>
-          {categories.map((category) => (
-            <div key={category} className="skills-group">
-              <h2>{category}</h2>
-              <div className="skills-list">
-                {vocabulary.filter((s) => s.category === category).map((skill) => (
-                  <label
-                    key={skill.id}
-                    className={chosen.has(skill.id) ? 'tag tag-on' : 'tag'}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={chosen.has(skill.id)}
-                      onChange={() => toggleSkill(skill.id)}
-                    />
-                    {skill.name}
-                  </label>
-                ))}
-              </div>
-            </div>
-          ))}
-        </fieldset>
+        <SkillPicker
+          vocabulary={vocabulary}
+          chosen={chosen}
+          onToggle={toggleSkill}
+          legend="What you can do"
+        />
 
         <div className="form-actions">
           <button className="btn" type="submit" disabled={busy}>

@@ -13,8 +13,9 @@ export default function WorkerDashboard() {
         and this is where you will find jobs to apply for.
       </p>
 
-      <p>
-        <Link className="btn" to="/worker/profile">Edit your profile</Link>
+      <p className="form-actions">
+        <Link className="btn" to="/jobs">Find work</Link>
+        <Link className="btn btn-quiet" to="/worker/profile">Edit your profile</Link>
       </p>
     </main>
   )

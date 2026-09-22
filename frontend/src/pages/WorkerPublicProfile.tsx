@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import type { PublicWorker } from '../api'
 import { workerService } from '../services/workerService'
+import { formatMoney } from '../format'
 
 /**
  * A worker as everyone else sees them: no email, no phone. A worker reaches it
@@ -24,11 +25,7 @@ export default function WorkerPublicProfile() {
   if (loading) return <main className="page"><p>Loading…</p></main>
   if (error || !worker) return <main className="page"><p className="error">{error || 'Worker not found'}</p></main>
 
-  // Always two decimal places: it is money, and a bare "450.5" reads as a
-  // typo rather than a rate.
-  const rate = worker.hourly_rate === null
-    ? null
-    : `₱${worker.hourly_rate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / hour`
+  const rate = worker.hourly_rate === null ? null : `${formatMoney(worker.hourly_rate)} / hour`
   const experience = worker.years_experience === null
     ? null
     : `${worker.years_experience} ${worker.years_experience === 1 ? 'year' : 'years'} of experience`

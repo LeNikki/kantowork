@@ -13,6 +13,11 @@ import WorkerProfileEdit from './pages/worker/ProfileEdit'
 import ClientDashboard from './pages/client/Dashboard'
 import ClientProfileEdit from './pages/client/ProfileEdit'
 import WorkerPublicProfile from './pages/WorkerPublicProfile'
+import JobBoard from './pages/JobBoard'
+import JobDetail from './pages/JobDetail'
+import MyJobs from './pages/client/MyJobs'
+import PostJob from './pages/client/PostJob'
+import EditJob from './pages/client/EditJob'
 import './App.css'
 
 /**
@@ -54,8 +59,10 @@ export default function App() {
       <Route element={<AuthLayout user={user} onLogout={() => setUser(null)} />}>
         <Route path="/dashboard" element={<DashboardHome />} />
 
-        {/* a worker as everyone else sees them - either role may look */}
+        {/* either role may look: the board, a posting, a worker's profile */}
         <Route path="/workers/:id" element={<WorkerPublicProfile />} />
+        <Route path="/jobs" element={<JobBoard />} />
+        <Route path="/jobs/:id" element={<JobDetail />} />
 
         {/* the worker's side - a client who comes here is sent back */}
         <Route element={<RoleGuard allow={['worker']} />}>
@@ -67,6 +74,9 @@ export default function App() {
         <Route element={<RoleGuard allow={['client']} />}>
           <Route path="/client" element={<ClientDashboard />} />
           <Route path="/client/profile" element={<ClientProfileEdit />} />
+          <Route path="/client/jobs" element={<MyJobs />} />
+          <Route path="/client/jobs/new" element={<PostJob />} />
+          <Route path="/client/jobs/:id/edit" element={<EditJob />} />
         </Route>
       </Route>
 

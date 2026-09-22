@@ -17,6 +17,13 @@ router.get('/', function(req, res, next) {
       'PUT  /api/workers/me/skills',
       'GET  /api/clients/me/profile',
       'PUT  /api/clients/me/profile',
+      'GET  /api/jobs',
+      'POST /api/jobs',
+      'GET  /api/jobs/mine',
+      'GET  /api/jobs/:id',
+      'PUT  /api/jobs/:id',
+      'PATCH /api/jobs/:id',
+      'DELETE /api/jobs/:id',
     ],
   });
 });

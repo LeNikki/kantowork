@@ -29,6 +29,30 @@ export type WorkerProfile = {
 // left out. A worker gives those out once they are chosen, not before.
 export type PublicWorker = Omit<WorkerProfile, 'email' | 'phone'>
 
+export type JobStatus = 'open' | 'assigned' | 'completed' | 'cancelled'
+export type BudgetType = 'fixed' | 'hourly'
+
+export type Job = {
+  id: number
+  client_id: number
+  client_name: string
+  title: string
+  description: string
+  location: string
+  budget_type: BudgetType
+  budget_min: number | null
+  budget_max: number | null
+  status: JobStatus
+  assigned_worker_id: number | null
+  // An ISO date (YYYY-MM-DD), not a timestamp: a deadline is a day, and
+  // carrying a time with it only invites it to shift by one.
+  deadline: string | null
+  created_at: string
+  skills: Skill[]
+}
+
+export type JobPage = { jobs: Job[]; total: number; limit: number; offset: number }
+
 export type ClientProfile = {
   user_id: number
   name: string

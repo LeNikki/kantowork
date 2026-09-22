@@ -11,6 +11,7 @@ var authRouter = require('./routes/auth');
 var workersRouter = require('./routes/workers');
 var clientsRouter = require('./routes/clients');
 var skillsRouter = require('./routes/skills');
+var jobsRouter = require('./routes/jobs');
 
 var app = express();
 
@@ -27,6 +28,7 @@ app.use('/api/users', usersRouter);
 app.use('/api/workers', workersRouter);
 app.use('/api/clients', clientsRouter);
 app.use('/api/skills', skillsRouter);
+app.use('/api/jobs', jobsRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
