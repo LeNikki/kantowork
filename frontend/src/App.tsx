@@ -1,14 +1,26 @@
 import { useEffect, useState } from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useOutletContext } from 'react-router-dom'
 import { getToken, type User } from './api'
 import { authService } from './services/authService'
 import GuestLayout from './layouts/GuestLayout'
 import AuthLayout from './layouts/AuthLayout'
+import RoleGuard from './layouts/RoleGuard'
 import Landing from './pages/Landing'
 import Login from './pages/user/auth/Login'
 import Signup from './pages/user/auth/Signup'
-import Home from './pages/user/Home'
+import WorkerDashboard from './pages/worker/Dashboard'
+import ClientDashboard from './pages/client/Dashboard'
 import './App.css'
+
+/**
+ * /dashboard belongs to whichever side you signed up as. Keeping one shared
+ * URL means nothing else - the top bar, a redirect after login - has to know
+ * the caller's role to link somewhere sensible.
+ */
+function DashboardHome() {
+  const { user } = useOutletContext<{ user: User }>()
+  return <Navigate to={user.role === 'worker' ? '/worker' : '/client'} replace />
+}
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null)
@@ -37,7 +49,17 @@ export default function App() {
 
       {/* signed in - the layout redirects an anonymous visitor to /login */}
       <Route element={<AuthLayout user={user} onLogout={() => setUser(null)} />}>
-        <Route path="/dashboard" element={<Home />} />
+        <Route path="/dashboard" element={<DashboardHome />} />
+
+        {/* the worker's side - a client who comes here is sent back */}
+        <Route element={<RoleGuard allow={['worker']} />}>
+          <Route path="/worker" element={<WorkerDashboard />} />
+        </Route>
+
+        {/* the client's side - a worker who comes here is sent back */}
+        <Route element={<RoleGuard allow={['client']} />}>
+          <Route path="/client" element={<ClientDashboard />} />
+        </Route>
       </Route>
 
       <Route path="*" element={<Navigate to="/" replace />} />

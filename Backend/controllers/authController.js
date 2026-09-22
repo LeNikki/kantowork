@@ -3,10 +3,11 @@ const {signToken, EXPIRES_IN} = require('../config/jwt');
 
 const signup = async (req, res, next)=>{
     try{
-        // `role` is deliberately NOT read from the body - a client must not be
-        // able to register itself as an admin.
-        const {name, email, password} = req.body;
-        const user = await authService.signup(name, email, password);
+        // `role` IS read from the body now - a visitor picks a side when they
+        // sign up. It is not free text: signupValidator allows only 'worker'
+        // or 'client', so this still cannot register itself as an admin.
+        const {name, email, password, role} = req.body;
+        const user = await authService.signup(name, email, password, role);
 
         res.status(201).json({
             message: 'User created successfully',
