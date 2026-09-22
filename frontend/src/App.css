@@ -457,6 +457,12 @@ a { color: var(--link); }
   line-height: 1.6;
   margin: 0 0 2rem;
 }
+/* One way in for each side, side by side until the screen is too narrow. */
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .8rem;
+}
 
 .features {
   display: grid;
