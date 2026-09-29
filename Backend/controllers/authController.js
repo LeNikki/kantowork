@@ -1,9 +1,10 @@
 const {signupService, loginService} = require('../services/authService');
+const {signToken, EXPIRES_IN} = require('../config/jwt');
 
 const signupController = async (req, res, next)=>{
     try{
-        const {name, email, password, role} = req.body;
-        const user = await signupService(name, email, password, role);
+        const {name, email, password, userRole} = req.body;
+        const user = await signupService(name, email, password, userRole);
 
         res.status(201).json({
             message: 'User created successfully',
@@ -21,7 +22,7 @@ const signupController = async (req, res, next)=>{
 
 const loginController = async (req, res, next)=>{
     try{
-        const {user, token} = await loginService(req.body.email, req.body.password );
+        const user = await loginService(req.body.email, req.body.password);
         res.json({
             message: 'Logged in successfully',
             user: user.toPublic(),

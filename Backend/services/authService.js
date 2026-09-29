@@ -12,7 +12,7 @@ const signupService = async (name, email, password, role)=>{
     }
     //hash password first
     const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
-    const result = await userQueries.createUser(name, email, password_hash, 'user');
+    const result = await userQueries.createUser(name, email, password_hash, role);
 
     return User.fromRow(result.rows[0]);
 };
@@ -30,12 +30,5 @@ const loginService = async(email, password)=>{
     return User.fromRow(user);
 }
 
-const getById = async (id)=>{
-    const result = await userQueries.findById(id);
-    if(result.rows.length === 0){
-        throw new Error('User not found');
-    }
-    return User.fromRow(result.rows[0]);
-};
 
 module.exports = {signupService, loginService};

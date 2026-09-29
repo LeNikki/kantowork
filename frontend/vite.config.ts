@@ -12,7 +12,11 @@ export default defineConfig({
     host: true, // bind 0.0.0.0 so the container is reachable from your Mac
     port: 5173,
     proxy: {
-      '/api': apiTarget,
+      '/api': {
+        target: apiTarget,
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
     },
   },
 })

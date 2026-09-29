@@ -14,6 +14,7 @@ export default function Login({ onAuth }: { onAuth: (u: User) => void }) {
     setBusy(true)
     try {
       const d = await api<AuthResponse>('/api/auth/login', { email, password })
+      console.log('response message:' + d.message)
       setToken(d.token)
       onAuth(d.user)
     } catch (err) {
