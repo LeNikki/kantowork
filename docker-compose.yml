@@ -10,6 +10,15 @@ services:
       PGPASSWORD: ${POSTGRES_PASSWORD}
       PGDATABASE: ${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
+      # Blank SMTP values are fine: mailer.js then prints reset emails to the
+      # console instead of sending them. The backend has no .env of its own
+      # (that file is not mounted), so everything must arrive through here.
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:5173}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-}
       NODE_ENV: development
     ports:
       - "3000:3000"
@@ -20,16 +29,30 @@ services:
       db:
         condition: service_healthy
 
+  # frontend:
+  #   build: ./frontend
+  #   container_name: kantowork-frontend
+  #   restart: unless-stopped
+  #   environment:
+  #     VITE_API_TARGET: http://backend:3000   # service name, not localhost
+  #   ports:
+  #     - "5173:5173"
+  #   volumes:
+  #     - ./frontend:/app         # your code -> container, enables hot reload
+  #     - /app/node_modules       # container keeps its own Linux node_modules
+  #   depends_on:
+  #     - backend
+
   frontend:
-    build: ./frontend
+    build: ./frontend_nextjs
     container_name: kantowork-frontend
     restart: unless-stopped
     environment:
-      VITE_API_TARGET: http://backend:3000   # service name, not localhost
+      BACKEND_URL: http://backend:3000   # service name, not localhost
     ports:
-      - "5173:5173"
+      - "5173:3000"                       # host 5173 -> next dev in container
     volumes:
-      - ./frontend:/app         # your code -> container, enables hot reload
+      - ./frontend_nextjs:/app         # your code -> container, enables hot reload
       - /app/node_modules       # container keeps its own Linux node_modules
     depends_on:
       - backend
